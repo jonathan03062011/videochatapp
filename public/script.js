@@ -7,6 +7,20 @@ var peer = new Peer(undefined, {
 });
 
 const user = prompt("Enter your name");
+const myvideo = document.createElement("video")
+myvideo.muted=true;
+let mystream;
+navigator.mediaDevices.getUserMedia({audio:true,video:true}).then((stream)=>
+{
+    mystream=stream
+    addVideoStream(myvideo,stream)
+})
+function addVideoStream(video, stream)
+ { video.srcObject = stream;
+    video.addEventListener("loadedmetadata", () => 
+    { video.play();
+     $("#video_grid").append(video) }); };
+
 
 $(function () {
     $("#show_chat").click(function () {
@@ -40,10 +54,11 @@ peer.on("open", (id) => {
     socket.emit("join-room", ROOM_ID, id, user);
 });
 
-socket.on("createMessage", (message) => {
+socket.on("createMessage", (message, userName) => {
     $(".messages").append(`
         <div class="message">
-        <b><i class="far fa-user-circle"></i><span>${userName===user?"me":"userName"}</span></b>
+            <b><i class="far fa-user-circle"></i> <span> ${userName === user ? "me" : userName
+        }</span> </b>
             <span>${message}</span>
         </div>
     `)
